@@ -12,6 +12,13 @@ uvx playwright install chromium
 uvx --with playwright python html_snapshot.py /path/to/slide.html --output slide.png
 ```
 
+Once the package is published to PyPI you can install it and use the console entry point:
+
+```bash
+pip install html-snapshot
+html-snapshot /path/to/slide.html --output slide.png
+```
+
 ## CLI options
 
 | Option | Description |
@@ -29,7 +36,7 @@ uv venv           # optional: create a local env for hacking
 uv pip install -r requirements.txt  # not necessary if using uvx
 ```
 
-For remote execution, the script can be invoked directly from a Git repo:
+For remote execution, the script can be invoked directly from this GitHub repo:
 
 ```bash
 uvx --with playwright python gh:oneryalcin/html-snapshot/html_snapshot.py sample.html

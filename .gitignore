@@ -2,4 +2,7 @@ __pycache__/
 *.pyc
 .env
 .venv/
+.venv*/
+dist/
+html_snapshot.egg-info/
 .DS_Store
