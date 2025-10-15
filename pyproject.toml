@@ -1,0 +1,12 @@
+[project]
+name = "html-snapshot"
+version = "0.1.0"
+description = "Capture a PNG screenshot of a local HTML presentation using Playwright"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "playwright>=1.46",
+]
+
+[project.scripts]
+html-snapshot = "html_snapshot:main"
