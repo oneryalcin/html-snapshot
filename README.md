@@ -12,6 +12,9 @@ uvx playwright install chromium
 
 # run the tool directly from PyPI (no pip install required)
 uvx html-snapshot /path/to/slide.html --output slide.png
+
+# optionally capture a structured layout report alongside the screenshot
+uvx html-snapshot /path/to/slide.html --output slide.png --report slide.json
 ```
 
 `uvx` downloads the `html-snapshot` package into a temporary, isolated environment every time you run it, so your main Python setup stays clean.
@@ -43,9 +46,11 @@ Need a newer version? `uv tool upgrade html-snapshot` fetches the latest release
 | ------ | ----------- |
 | `html_path` | Path to the local HTML file to render |
 | `-o / --output` | Output PNG path (default: same as input with `.png` suffix) |
+| `--report` | Optional JSON path containing layout metadata (word counts, bounding boxes, warnings) |
 | `--width` / `--height` | Viewport size (default: 1400×900) |
 | `--delay` | Seconds to wait after load before capturing |
 | `--no-full-page` | Capture only the viewport instead of the full page |
+| `--no-auto-install` | Skip automatic Playwright Chromium install |
 
 ## Development
 
