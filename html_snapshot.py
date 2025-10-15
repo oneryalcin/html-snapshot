@@ -12,6 +12,9 @@ Before first run, install the Playwright browser binaries:
 from __future__ import annotations
 
 import argparse
+import os
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 from typing import Optional
@@ -47,7 +50,57 @@ def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
         action="store_true",
         help="Capture only the viewport instead of the full page",
     )
+    parser.add_argument(
+        "--no-auto-install",
+        action="store_true",
+        help="Skip automatic Playwright browser install (requires chromium to be pre-installed)",
+    )
     return parser.parse_args(argv)
+
+
+def default_browsers_path() -> Path:
+    env_path = os.environ.get("PLAYWRIGHT_BROWSERS_PATH")
+    if env_path:
+        return Path(env_path)
+
+    home = Path.home()
+    if sys.platform == "win32":
+        base = Path(os.environ.get("LOCALAPPDATA", home / "AppData/Local"))
+        return base / "ms-playwright"
+    if sys.platform == "darwin":
+        return home / "Library/Caches/ms-playwright"
+    return home / ".cache/ms-playwright"
+
+
+def chromium_installed() -> bool:
+    browsers_dir = default_browsers_path()
+    if not browsers_dir.exists():
+        return False
+    return any(browsers_dir.glob("chromium-*"))
+
+
+def ensure_chromium_installed(auto_install: bool) -> None:
+    if chromium_installed():
+        return
+    if not auto_install:
+        raise RuntimeError(
+            "Chromium browser binaries are missing. "
+            "Run `uvx playwright install chromium` and try again."
+        )
+    if not shutil.which("playwright"):
+        raise RuntimeError(
+            "Playwright CLI not found. Install dependencies or set PLAYWRIGHT_BROWSERS_PATH."
+        )
+    print(
+        "Chromium runtime not found; installing via `playwright install chromium`...",
+        file=sys.stderr,
+    )
+    try:
+        subprocess.run(["playwright", "install", "chromium"], check=True)
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            "Automatic Chromium install failed. Run `uvx playwright install chromium` manually."
+        ) from exc
 
 
 def capture_screenshot(
@@ -77,6 +130,8 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     output_path = args.output.resolve() if args.output else html_path.with_suffix(".png")
     output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    ensure_chromium_installed(auto_install=not args.no_auto_install)
 
     with sync_playwright() as p:
         browser = p.chromium.launch()

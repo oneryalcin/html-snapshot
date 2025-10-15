@@ -15,6 +15,7 @@ uvx html-snapshot /path/to/slide.html --output slide.png
 ```
 
 `uvx` downloads the `html-snapshot` package into a temporary, isolated environment every time you run it, so your main Python setup stays clean.
+If Chromium is missing, the tool attempts to run `playwright install chromium` automatically (disable with `--no-auto-install`).
 
 Once the package is published to PyPI you can install it and use the console entry point:
 
