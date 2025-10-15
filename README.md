@@ -4,13 +4,17 @@ Capture a PNG screenshot from a local HTML presentation using Playwright.
 
 ## Quick start
 
+### Zero-install (recommended)
+
 ```bash
-# one-time: install Playwright browser assets
+# one-time: install the Chromium runtime that Playwright needs
 uvx playwright install chromium
 
-# run the script with uvx
-uvx --with playwright python html_snapshot.py /path/to/slide.html --output slide.png
+# run the tool directly from PyPI (no pip install required)
+uvx html-snapshot /path/to/slide.html --output slide.png
 ```
+
+`uvx` downloads the `html-snapshot` package into a temporary, isolated environment every time you run it, so your main Python setup stays clean.
 
 Once the package is published to PyPI you can install it and use the console entry point:
 
@@ -18,6 +22,19 @@ Once the package is published to PyPI you can install it and use the console ent
 pip install html-snapshot
 html-snapshot /path/to/slide.html --output slide.png
 ```
+
+### Persistent installation with uv
+
+If you call the tool often, keep it on your PATH with:
+
+```bash
+uv tool install html-snapshot
+
+# later
+html-snapshot /path/to/slide.html --output slide.png
+```
+
+Need a newer version? `uv tool upgrade html-snapshot` fetches the latest release.
 
 ## CLI options
 
@@ -36,7 +53,7 @@ uv venv           # optional: create a local env for hacking
 uv pip install -r requirements.txt  # not necessary if using uvx
 ```
 
-For remote execution, the script can be invoked directly from this GitHub repo:
+For remote execution straight from GitHub (without PyPI), run:
 
 ```bash
 uvx --with playwright python gh:oneryalcin/html-snapshot/html_snapshot.py sample.html
