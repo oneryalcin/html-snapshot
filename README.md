@@ -1,65 +1,53 @@
 # html-snapshot
 
-Capture a PNG screenshot from a local HTML presentation using Playwright.
+Capture ppt-canvas HTML slides as PNGs and (optionally) emit a structured layout report for automated checks.
 
-## Quick start
-
-### Zero-install (recommended)
+## Quick start (no install)
 
 ```bash
-# one-time: install the Chromium runtime that Playwright needs
+# one-time: ensure Playwright's Chromium runtime is available
 uvx playwright install chromium
 
-# run the tool directly from PyPI (no pip install required)
-uvx html-snapshot /path/to/slide.html --output slide.png
-
-# optionally capture a structured layout report alongside the screenshot
-uvx html-snapshot /path/to/slide.html --output slide.png --report slide.json
+# generate a slide screenshot, plus an optional JSON layout report
+uvx html-snapshot /path/to/slide.html \
+    --output slide.png \
+    --report slide.json
 ```
 
-`uvx` downloads the `html-snapshot` package into a temporary, isolated environment every time you run it, so your main Python setup stays clean.
-If Chromium is missing, the tool attempts to run `playwright install chromium` automatically (disable with `--no-auto-install`).
+`uvx` runs the tool in an isolated environment downloaded from PyPI. The script auto-installs Chromium if it is missing (skip with `--no-auto-install`).
 
-Once the package is published to PyPI you can install it and use the console entry point:
+## Install once, reuse often
+
+Prefer a persistent CLI?
+
+```bash
+uv tool install html-snapshot   # adds `html-snapshot` to your PATH
+
+html-snapshot /path/to/slide.html --output slide.png --report slide.json
+```
+
+Or use pip:
 
 ```bash
 pip install html-snapshot
 html-snapshot /path/to/slide.html --output slide.png
 ```
 
-### Persistent installation with uv
-
-If you call the tool often, keep it on your PATH with:
-
-```bash
-uv tool install html-snapshot
-
-# later
-html-snapshot /path/to/slide.html --output slide.png
-```
-
-Need a newer version? `uv tool upgrade html-snapshot` fetches the latest release.
-
 ## CLI options
 
 | Option | Description |
 | ------ | ----------- |
 | `html_path` | Path to the local HTML file to render |
-| `-o / --output` | Output PNG path (default: same as input with `.png` suffix) |
-| `--report` | Optional JSON path containing layout metadata (word counts, bounding boxes, warnings) |
+| `-o / --output` | Output PNG path (default: input with `.png` suffix) |
+| `--report` | Optional JSON layout report (words, bounding boxes, warnings) |
 | `--width` / `--height` | Viewport size (default: 1400×900) |
-| `--delay` | Seconds to wait after load before capturing |
-| `--no-full-page` | Capture only the viewport instead of the full page |
-| `--no-auto-install` | Skip automatic Playwright Chromium install |
+| `--delay` | Wait time after load before capture |
+| `--no-full-page` | Capture only the viewport |
+| `--no-auto-install` | Require Chromium to be pre-installed |
 
-## Development
+## Direct-from-GitHub fallback
 
-```bash
-uv venv           # optional: create a local env for hacking
-uv pip install -r requirements.txt  # not necessary if using uvx
-```
-
-For remote execution straight from GitHub (without PyPI), run:
+If you’d rather run the latest commit without PyPI:
 
 ```bash
 uvx --with playwright python gh:oneryalcin/html-snapshot/html_snapshot.py sample.html
