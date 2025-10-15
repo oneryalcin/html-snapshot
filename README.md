@@ -1,6 +1,6 @@
 # html-snapshot
 
-Capture ppt-canvas HTML slides as PNGs and (optionally) emit a structured layout report for automated checks.
+Capture any HTML page as a PNG and (optionally) emit a structured layout report for automated checks.
 
 ## Quick start (no install)
 
