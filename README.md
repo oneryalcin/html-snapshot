@@ -50,5 +50,5 @@ html-snapshot /path/to/slide.html --output slide.png
 If you’d rather run the latest commit without PyPI:
 
 ```bash
-uvx --with playwright python gh:oneryalcin/html-snapshot/html_snapshot.py sample.html
+uvx --from git+https://github.com/oneryalcin/html-snapshot html-snapshot sample.html --output slide.png
 ```
