@@ -224,15 +224,25 @@ def extract_slide_data(page: Page, html_path: Path) -> Dict[str, Any]:
                 f"Slide {index + 1} right half has {right_words} words (>160)."
             )
 
-        overflow_items = [
-            {
-                "text": item["text"],
-                "tag": item["tag"],
-                "bbox_slide": item["bbox_slide"],
-            }
-            for item in items
-            if item.get("overflow")
-        ]
+        overflow_items = []
+        for item in items:
+            y_top = item["bbox_slide"][1]
+            y_bottom = item["bbox_slide"][1] + item["bbox_slide"][3]
+            overflow_flag = (
+                item.get("overflow")
+                or y_top < -2
+                or y_bottom > slide_bbox["height"] + 2
+            )
+            if overflow_flag:
+                overflow_items.append(
+                    {
+                        "text": item["text"],
+                        "tag": item["tag"],
+                        "bbox_slide": item["bbox_slide"],
+                        "bbox_viewport": item["bbox_viewport"],
+                    }
+                )
+                item["overflow"] = True
 
         overlaps = [
             {
