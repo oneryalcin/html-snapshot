@@ -150,6 +150,7 @@ def extract_slide_data(page: Page, html_path: Path) -> Dict[str, Any]:
             r"""
             (el) => {
                 const items = [];
+                const nodes = [];
                 const walker = document.createTreeWalker(el, NodeFilter.SHOW_ELEMENT);
                 while (walker.nextNode()) {
                     const node = walker.currentNode;
@@ -157,10 +158,13 @@ def extract_slide_data(page: Page, html_path: Path) -> Dict[str, Any]:
                     if (node.offsetParent === null) continue; // hidden
                     const text = node.innerText ? node.innerText.trim() : "";
                     if (!text) continue;
+                    const hasDirectText = Array.from(node.childNodes).some(
+                        (child) => child.nodeType === 3 && child.textContent.trim()
+                    );
                     const hasChildText = Array.from(node.children).some(
                         (child) => child.innerText && child.innerText.trim().length > 0
                     );
-                    if (hasChildText) continue;
+                    if (hasChildText && !hasDirectText) continue;
                     const rect = node.getBoundingClientRect();
                     if (!rect || rect.width === 0 || rect.height === 0) continue;
                     const style = window.getComputedStyle(node);
@@ -177,7 +181,20 @@ def extract_slide_data(page: Page, html_path: Path) -> Dict[str, Any]:
                         fontWeight: style.fontWeight,
                         overflow: node.scrollHeight > node.clientHeight + 1
                     });
+                    nodes.push(node);
                 }
+
+                // Add parent/child relationship data
+                items.forEach((item, i) => {
+                    item.index = i;
+                    item.ancestors = [];
+                    for (let j = 0; j < nodes.length; j++) {
+                        if (i !== j && nodes[j].contains(nodes[i])) {
+                            item.ancestors.push(j);
+                        }
+                    }
+                });
+
                 const slideStyle = window.getComputedStyle(el);
                 return {
                     items,
@@ -253,6 +270,8 @@ def extract_slide_data(page: Page, html_path: Path) -> Dict[str, Any]:
             }
             for a, b in combinations(items, 2)
             if bbox_overlap(a["bbox_slide"], b["bbox_slide"])
+            and b.get("index") not in a.get("ancestors", [])
+            and a.get("index") not in b.get("ancestors", [])
         ]
 
         slide_summary = {
